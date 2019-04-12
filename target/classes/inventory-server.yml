@@ -1,0 +1,12 @@
+# Configure this Inventory to register with Eureka registration Server
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+
+spring:
+  application:
+     name: inventory-service  # Service registers under this name
+
+server:
+  port: 1111   # HTTP (Tomcat) port

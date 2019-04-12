@@ -1,0 +1,18 @@
+# Spring properties
+spring:
+  application:
+     name: customer-service  # Service registers under this name
+
+# HTTP Server
+server.port: 2222   # HTTP (Tomcat) port
+
+# Configure this Customer to register with Eureka registration Server
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+
+#management.endpoints.web.exposure.include: '*'
+
+
+

@@ -1,0 +1,7 @@
+# Configure this Registration Server as Eureka server
+server:
+  port: 8761
+eureka:
+  client:
+    registerWithEureka: false
+    fetchRegistry: false

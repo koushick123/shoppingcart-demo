@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 @org.springframework.stereotype.Repository
 public interface CustomerRepository extends Repository<Customer, Long>{
 
-	@Query(value="SELECT CUST_ID FROM T_CUSTOMER WHERE EMAIL = ?1", nativeQuery=true)
-	public Long findCustomer(String email);
+	@Query(value="SELECT CUST_ID, EMAIL, NAME FROM T_CUSTOMER WHERE EMAIL = ?1", nativeQuery=true)
+	public Customer findCustomer(String email);
 	
 	public List<Customer> findCustomerById(Long id);
 		

@@ -15,7 +15,7 @@ public class CustomerServiceImpl implements CustomerRepository{
 	@Autowired
 	CustomerRepository custRepo;
 	@Override
-	public Long findCustomer(String email) {
+	public Customer findCustomer(String email) {
 		// TODO Auto-generated method stub
 		return custRepo.findCustomer(email);
 	}

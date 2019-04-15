@@ -3,9 +3,7 @@ package com.shoppingcart.anzdemo.controllers;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,15 +24,8 @@ public class InventoryController {
 	@Autowired
 	InventoryServiceImpl invServ;	
 	
-	@Bean
-	@LoadBalanced
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-	
 	@Autowired
 	RestTemplate restTempl;
-		
 	/*
 	 * This method is just to test if Inter service communication is working using Eureka
 	 */

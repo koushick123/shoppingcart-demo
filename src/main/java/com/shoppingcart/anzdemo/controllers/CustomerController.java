@@ -55,29 +55,36 @@ public class CustomerController {
 		return "This means API is returning a response";
 	}
 	
-	public Long doesCustomerExist(String email){
+	@RequestMapping("/isexistsornot/{email}")
+	@ResponseStatus(HttpStatus.OK)
+	public Long doesCustomerExist(@PathVariable("email") String email){
 		logger.info("Checking if "+email+" exists in system");
-		Long cId = custService.findCustomer(email);
-		logger.info("Cid = "+cId);
+		Customer cId = custService.findCustomer(email);
 		if(cId == null){
 			throw new CustomerNotFoundException(email);
 		}
-		return cId;
+		else{
+			logger.info("Cid = "+cId.getId());
+		}
+		return cId.getId();
 	}
+	
 	@RequestMapping(value="/create", method=RequestMethod.POST, consumes={"application/json"})
-	@ResponseStatus(HttpStatus.OK)
-	public void createCustomer(@RequestBody CustomerDTO newCust){
-		try
-		{
-			doesCustomerExist(newCust.getEmail());
-		}
-		catch(CustomerNotFoundException notfound){
-			logger.info("CustomerNotFoundException == "+notfound.getMessage());
-			Long newCustId = Customer.getCustId();
-			logger.info("inserting newCustId = "+newCustId);
-			custService.createNewCustomer(newCustId, newCust.getEmail(), newCust.getName());
-			Long cId = custService.findCustomerById(newCustId).get(0).getId();
-			logger.info("AFTER INSERTION Cid = "+cId);
-		}
+	@ResponseStatus(HttpStatus.CREATED)	
+	public Long createCustomer(@RequestBody CustomerDTO newCust){
+		Long newCustId = Customer.getCustId();
+		logger.info("inserting newCustId = "+newCustId);
+		custService.createNewCustomer(newCustId, newCust.getEmail(), newCust.getName());
+		return newCustId;
+	}
+	
+	@RequestMapping(value="/getcustomer/bymail/{email}", method = RequestMethod.GET, produces={"application/json"})
+	public CustomerDTO getCustomerByEmail(@PathVariable("email") String mail){
+		CustomerDTO custDto = new CustomerDTO();
+		Customer customer = custService.findCustomer(mail);
+		custDto.setEmail(customer.getEmail());
+		custDto.setId(customer.getId());
+		custDto.setName(customer.getName());
+		return custDto;		
 	}
 }

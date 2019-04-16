@@ -24,6 +24,7 @@ import com.shoppingcart.anzdemo.checkoutorder.CheckoutOrder;
 import com.shoppingcart.anzdemo.checkoutorder.PurchaseDTO;
 import com.shoppingcart.anzdemo.customer.CustomerDTO;
 import com.shoppingcart.anzdemo.exceptions.PurchaseInCompleteException;
+import com.shoppingcart.anzdemo.inventory.InventoryDTO;
 import com.shoppingcart.anzdemo.services.CheckoutOrderServiceImpl;
 
 @RestController
@@ -44,6 +45,8 @@ public class CheckoutOrderCustomerController {
 	public void makePurchase(@RequestBody PurchaseDTO newPurchase){
 		//Check for customer
 		Long customerId = null;
+		Long inventoryId = null;
+		//Check for existing customer
 		try{
 			Long custId = Long.valueOf(restTempl.getForObject("http://customer-service/customer/isexistsornot/{email}", 
 					String.class, newPurchase.getEmail()));
@@ -80,10 +83,22 @@ public class CheckoutOrderCustomerController {
 				customerId = newCust2.getId();
 			}
 		}
-		logger.info("Make purchase for "+customerId);
-		if(customerId != null){
+		//Check for inventory
+		try{
+			InventoryDTO inven = restTempl.getForObject("http://inventory-service/inventory/existsornot/{invId}", InventoryDTO.class,
+					newPurchase.getInvId());
+			logger.info("inven Id = "+inven.getInvId());
+			inventoryId = inven.getInvId();
+		}
+		catch(RestClientException ex){
+			logger.info("INVEN Rest Exception == "+ex.getMessage());
+			throw new PurchaseInCompleteException(newPurchase.getInvId(), customerId, 
+					"Unable to find Inventory");
+		}
+		logger.info("MAKE PURCHASE for "+customerId+", with inventory "+inventoryId);
+		if(customerId != null && inventoryId != null){
 			Long newOrderId = CheckoutOrder.getNextCheckoutOrderId();
-			checkoutService.doOrderCheckout(newPurchase.getInvId(), customerId, newOrderId);
+			checkoutService.doOrderCheckout(inventoryId, customerId, newOrderId);
 			CheckoutOrder newOrder = checkoutService.findCheckoutOrderById(newOrderId);
 			logger.info("checkout order info === "+newOrder.getCustId()+" , Inv id = "+
 			newOrder.getInvId()+" , Order date = "+newOrder.getOrderDate());

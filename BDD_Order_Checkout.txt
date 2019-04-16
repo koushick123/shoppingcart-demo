@@ -1,0 +1,19 @@
+Given 
+I am an existing user with email user1@gmail.com
+
+When
+I checkout an order for item 1003 that exists
+
+Then
+I get custId 1000 for customer user1@gmail.com 
+and I get a new orderId 2000 for custId 1000 and email user1@gmail.com for item 1003
+
+Given
+I am not an existing user with email user2@gmail.com
+
+When
+I checkout an order for item 1002 that exists
+
+Then
+shoppingcart-demo creates a customer with custId 1004 and email user2@gmail.com
+and I get a new orderId 2001 for cusId 1004 and email user2@gmail.com for item 1002

@@ -46,14 +46,6 @@ public class CustomerController {
 		}
 		return cusObj;
 	}
-	/*
-	 * This is to test if the API is working.
-	 */
-	@RequestMapping(value="/show", method=RequestMethod.GET)
-	@ResponseBody
-	public String getMessage(){
-		return "This means API is returning a response";
-	}
 	
 	@RequestMapping(value="/isexistsornot/{email}", method=RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
@@ -66,7 +58,7 @@ public class CustomerController {
 		else{
 			logger.info("Cid = "+cId.getId());
 		}
-		return cId.getId()+"";
+		return String.valueOf(cId.getId());
 	}
 	
 	@RequestMapping(value="/create", method=RequestMethod.POST, consumes={"application/json"}, produces={"application/json"})
@@ -89,6 +81,6 @@ public class CustomerController {
 		custDto.setEmail(customer.getEmail());
 		custDto.setId(customer.getId());
 		custDto.setName(customer.getName());
-		return custDto;		
+		return custDto;
 	}
 }

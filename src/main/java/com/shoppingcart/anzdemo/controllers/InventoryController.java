@@ -13,6 +13,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.shoppingcart.anzdemo.customer.CustomerDTO;
+import com.shoppingcart.anzdemo.exceptions.InventoryNotFoundException;
 import com.shoppingcart.anzdemo.inventory.Inventory;
 import com.shoppingcart.anzdemo.inventory.InventoryDTO;
 import com.shoppingcart.anzdemo.services.InventoryServiceImpl;
@@ -57,7 +58,7 @@ public class InventoryController {
 			return inventory;
 		}
 		else{
-			return new InventoryDTO(Long.MIN_VALUE, "No Name Exists", "No Description Exists");
+			throw new InventoryNotFoundException(String.valueOf(invId));
 		}
 	}
 }

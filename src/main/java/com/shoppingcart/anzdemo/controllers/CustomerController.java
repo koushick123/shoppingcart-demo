@@ -55,9 +55,9 @@ public class CustomerController {
 		return "This means API is returning a response";
 	}
 	
-	@RequestMapping("/isexistsornot/{email}")
+	@RequestMapping(value="/isexistsornot/{email}", method=RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	public Long doesCustomerExist(@PathVariable("email") String email){
+	public String doesCustomerExist(@PathVariable("email") String email){
 		logger.info("Checking if "+email+" exists in system");
 		Customer cId = custService.findCustomer(email);
 		if(cId == null){
@@ -66,22 +66,26 @@ public class CustomerController {
 		else{
 			logger.info("Cid = "+cId.getId());
 		}
-		return cId.getId();
+		return cId.getId()+"";
 	}
 	
-	@RequestMapping(value="/create", method=RequestMethod.POST, consumes={"application/json"})
-	@ResponseStatus(HttpStatus.CREATED)	
-	public Long createCustomer(@RequestBody CustomerDTO newCust){
+	@RequestMapping(value="/create", method=RequestMethod.POST, consumes={"application/json"}, produces={"application/json"})
+	@ResponseStatus(HttpStatus.CREATED)
+	@ResponseBody
+	public CustomerDTO createCustomer(@RequestBody CustomerDTO newCust){
 		Long newCustId = Customer.getCustId();
 		logger.info("inserting newCustId = "+newCustId);
 		custService.createNewCustomer(newCustId, newCust.getEmail(), newCust.getName());
-		return newCustId;
+		CustomerDTO createdCust = new CustomerDTO();
+		createdCust.setId(newCustId);
+		return createdCust;
 	}
 	
 	@RequestMapping(value="/getcustomer/bymail/{email}", method = RequestMethod.GET, produces={"application/json"})
 	public CustomerDTO getCustomerByEmail(@PathVariable("email") String mail){
 		CustomerDTO custDto = new CustomerDTO();
 		Customer customer = custService.findCustomer(mail);
+		logger.info("RETRIEVED RECORD = "+customer.getEmail()+" , "+customer.getName()+" , "+customer.getId());
 		custDto.setEmail(customer.getEmail());
 		custDto.setId(customer.getId());
 		custDto.setName(customer.getName());

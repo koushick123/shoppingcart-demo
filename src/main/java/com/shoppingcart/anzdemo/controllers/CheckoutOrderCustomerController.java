@@ -1,14 +1,17 @@
 package com.shoppingcart.anzdemo.controllers;
 
-import io.netty.handler.codec.http.HttpHeaders;
-
 import java.util.logging.Logger;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,10 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.google.gson.JsonObject;
 import com.shoppingcart.anzdemo.checkoutorder.CheckoutOrder;
 import com.shoppingcart.anzdemo.checkoutorder.PurchaseDTO;
 import com.shoppingcart.anzdemo.customer.CustomerDTO;
+import com.shoppingcart.anzdemo.exceptions.PurchaseInCompleteException;
 import com.shoppingcart.anzdemo.services.CheckoutOrderServiceImpl;
 
 @RestController
@@ -42,8 +45,8 @@ public class CheckoutOrderCustomerController {
 		//Check for customer
 		Long customerId = null;
 		try{
-			Long  custId = restTempl.getForObject("http://customer-service/customer/isexistsornot/{email}", 
-					Long.class, newPurchase.getEmail());
+			Long custId = Long.valueOf(restTempl.getForObject("http://customer-service/customer/isexistsornot/{email}", 
+					String.class, newPurchase.getEmail()));
 			logger.info("custId == "+custId);
 			customerId = custId;
 		}
@@ -52,24 +55,29 @@ public class CheckoutOrderCustomerController {
 			if(excep.getMessage().contains("null")){
 				logger.info("Need to create new customer");
 				//Create new customer
-				CustomerDTO newCust = new CustomerDTO();
-				newCust.setId(null);
-				newCust.setName(newPurchase.getName());
-				newCust.setEmail(newPurchase.getEmail());
-				JsonObject custJson = new JsonObject();
-				custJson.addProperty("id", "");
-				custJson.addProperty("email", newCust.getEmail());
-				custJson.addProperty("name", newCust.getName());
-				org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+				JSONObject custJson = new JSONObject();
+				try {
+					custJson.put("email", newPurchase.getEmail());
+					custJson.put("name", newPurchase.getName());
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				// set headers
+				HttpHeaders headers = new HttpHeaders();
 				headers.setContentType(MediaType.APPLICATION_JSON);
+				HttpEntity<String> entity = new HttpEntity<String>(custJson.toString(), headers);
 				logger.info("Sending JSON = "+custJson.toString());
-				HttpEntity<String> reqObj = new HttpEntity<String>(custJson.toString(), headers);
-				restTempl.postForObject("http://customer-service/customer/create", reqObj, Long.class);				
-				logger.info("Created New Customer. Fetch by mail == "+newCust.getEmail());
-				newCust = restTempl.getForObject("http://customer-service/getcustomer/bymail", CustomerDTO.class,
+				ResponseEntity<CustomerDTO> custResp = restTempl.exchange("http://customer-service/customer/create", 
+						HttpMethod.POST, entity, CustomerDTO.class);
+				if (custResp.getStatusCode() != HttpStatus.CREATED) {
+					throw new PurchaseInCompleteException(newPurchase.getInvId(), -1L, 
+							"Unable to Create new Customer");
+				}				
+				CustomerDTO newCust2 = restTempl.getForObject("http://customer-service/customer/getcustomer/bymail/{email}", CustomerDTO.class,
 						newPurchase.getEmail());
-				logger.info("Created customer = "+newCust.getId());
-				customerId = newCust.getId();				
+				logger.info("Created customer = "+newCust2.getId());
+				customerId = newCust2.getId();
 			}
 		}
 		logger.info("Make purchase for "+customerId);

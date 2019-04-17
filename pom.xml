@@ -3,12 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.springframework.samples.service.service</groupId>
     <artifactId>shoppingcart-demo</artifactId>
-    <version>2.0.0.RELEASE</version>
+    <version>1.0.RELEASE</version>
     <packaging>jar</packaging>
 
     <properties>
-        <!-- Stand-alone RESTFul application for testing only -->
-        <start-class>io.pivotal.microservices.services.Main</start-class>
+        <start-class>com.shoppingcart.anzdemo.services.ShoppingCartMain</start-class>
     </properties>
 
     <parent>

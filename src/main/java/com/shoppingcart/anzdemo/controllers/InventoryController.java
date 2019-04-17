@@ -4,15 +4,19 @@ import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.shoppingcart.anzdemo.customer.CustomerDTO;
+import com.shoppingcart.anzdemo.exceptions.InventoryCreateException;
 import com.shoppingcart.anzdemo.exceptions.InventoryNotFoundException;
 import com.shoppingcart.anzdemo.inventory.Inventory;
 import com.shoppingcart.anzdemo.inventory.InventoryDTO;
@@ -46,6 +50,7 @@ public class InventoryController {
 	
 	@RequestMapping(value="/existsornot/{invId}",method=RequestMethod.GET, produces={"application/json"})
 	@ResponseBody
+	@ResponseStatus(HttpStatus.OK)
 	public InventoryDTO doesInventoryExist(@PathVariable("invId") long invId){
 		InventoryDTO inventory = new InventoryDTO();
 		Long invID = invServ.doesInventoryExist(new Long(invId));
@@ -60,5 +65,21 @@ public class InventoryController {
 		else{
 			throw new InventoryNotFoundException(String.valueOf(invId));
 		}
+	}
+	
+	@RequestMapping(value="/addinventory", method=RequestMethod.POST, consumes={"application/json"})
+	@ResponseStatus(HttpStatus.CREATED)
+	public void addIventoryItem(@RequestBody InventoryDTO newInven){
+		if(newInven.getDescription().trim().equals("") ||
+				newInven.getName().trim().equals("")){
+				if(newInven.getDescription().trim().equals("")){
+					throw new InventoryCreateException("No Inventory description given");
+				}
+				else{
+					throw new InventoryCreateException("No Inventory name given");
+				}
+		}
+		newInven.setInvId(InventoryDTO.getNextInventoryId());
+		invServ.addNewInventoryItem(newInven.getInvId(), newInven.getName(), newInven.getDescription());
 	}
 }

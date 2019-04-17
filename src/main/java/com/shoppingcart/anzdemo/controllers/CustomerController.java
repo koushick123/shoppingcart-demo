@@ -30,6 +30,7 @@ public class CustomerController {
 	
 	@RequestMapping(value = "/getcustomer/{cusId}", method = RequestMethod.GET, produces={"application/json"})
 	@ResponseBody
+	@ResponseStatus(HttpStatus.OK)
 	public CustomerDTO fetchCustomer(@PathVariable("cusId") long cusId){
 		CustomerDTO cusObj = new CustomerDTO();
 		List<Customer> customer = (List<Customer>) custService.findCustomerById(cusId);
@@ -74,6 +75,7 @@ public class CustomerController {
 	}
 	
 	@RequestMapping(value="/getcustomer/bymail/{email}", method = RequestMethod.GET, produces={"application/json"})
+	@ResponseStatus(HttpStatus.OK)
 	public CustomerDTO getCustomerByEmail(@PathVariable("email") String mail){
 		CustomerDTO custDto = new CustomerDTO();
 		Customer customer = custService.findCustomer(mail);

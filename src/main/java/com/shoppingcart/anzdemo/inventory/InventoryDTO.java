@@ -15,6 +15,13 @@ public class InventoryDTO {
 		description = desc;
 	}
 	
+	private static Long inventoryId = 1005L;
+	
+	public static Long getNextInventoryId(){
+		synchronized (inventoryId){
+			return ++inventoryId;
+		}
+	}
 	public InventoryDTO() {
 		// TODO Auto-generated constructor stub
 	}

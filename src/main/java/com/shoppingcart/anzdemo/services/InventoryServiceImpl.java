@@ -23,4 +23,10 @@ public class InventoryServiceImpl implements InventoryRepository{
 		return invRepo.findByNumber(invId);
 	}
 
+	@Override
+	public void addNewInventoryItem(Long invId, String name, String description) {
+		// TODO Auto-generated method stub
+		invRepo.addNewInventoryItem(invId, name, description);
+	}
+
 }

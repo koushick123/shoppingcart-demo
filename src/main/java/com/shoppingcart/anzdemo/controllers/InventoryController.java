@@ -36,8 +36,6 @@ public class InventoryController {
 	 */
 	@RequestMapping(value="/getCustInfo/{id}", method=RequestMethod.GET, produces={"application/json"})
 	public void getCustomerInfo(@PathVariable("id") String id){
-		String result = restTempl.getForObject("http://customer-service/customer/show", String.class);
-		logger.info("Fetch from CUSTOMER-SERVICE = "+result);
 		try{
 			CustomerDTO cust = restTempl.getForObject("http://customer-service/customer/getcustomer/{cusId}",
 					CustomerDTO.class, id);

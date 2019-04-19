@@ -18,7 +18,7 @@ The 3 microservices of the application are:<br>
 </ul>
 <br>
 The application has been deployed onto Docker Hub, where 4 container images have been pushed for each of the 4 microservices (registration, customer, inventory and checkout) onto koushick123/shoppingcart-demo. <br>To run this application in a containerized version, after you build and run the registration service locally, use docker command <b>docker inspect &lt;registration_container_id&gt;</b> to obtain the IP address of the eureka registration server.<br>
-Use the above IP address to update the below files, before you start the rest of the services so that they are able to register themselves with Eureka registration service.<br>
+<br>Use the above IP address to update the below files, before you start the rest of the services so that they are able to register themselves with Eureka registration service.<br>
 <ul>
   <li><b>customer-server.yml</b></li>
   <li><b>inventory-server.yml</b></li>

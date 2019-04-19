@@ -1,5 +1,7 @@
 package com.shoppingcart.anzdemo.checkoutorder;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
@@ -18,4 +20,7 @@ public interface CheckoutOrderRepository extends Repository<CheckoutOrder, Long>
 	@Query(value="SELECT CUST_ID, INV_ID, ORDER_ID, ORDER_DATE FROM T_ORDER_CHECKOUT WHERE ORDER_ID = :orderId",
 			nativeQuery=true)
 	public CheckoutOrder findCheckoutOrderById(@Param("orderId") Long orderId);
+	
+	@Query(value="SELECT CUST_ID, INV_ID, ORDER_ID, ORDER_DATE FROM T_ORDER_CHECKOUT", nativeQuery=true)
+	public List<CheckoutOrder> findAllCheckoutOrders();
 }

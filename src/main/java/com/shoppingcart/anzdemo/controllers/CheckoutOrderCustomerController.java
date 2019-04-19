@@ -1,6 +1,9 @@
 package com.shoppingcart.anzdemo.controllers;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,17 +15,21 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.shoppingcart.anzdemo.checkoutorder.CheckoutOrder;
+import com.shoppingcart.anzdemo.checkoutorder.CheckoutOrderDTO;
 import com.shoppingcart.anzdemo.checkoutorder.PurchaseDTO;
 import com.shoppingcart.anzdemo.customer.CustomerDTO;
+import com.shoppingcart.anzdemo.exceptions.CustomerNotFoundException;
 import com.shoppingcart.anzdemo.exceptions.PurchaseInCompleteException;
 import com.shoppingcart.anzdemo.inventory.InventoryDTO;
 import com.shoppingcart.anzdemo.services.CheckoutOrderServiceImpl;
@@ -76,11 +83,22 @@ public class CheckoutOrderCustomerController {
 				if (custResp.getStatusCode() != HttpStatus.CREATED) {
 					throw new PurchaseInCompleteException(newPurchase.getInvId(), -1L, 
 							"Unable to Create new Customer");
-				}				
-				CustomerDTO newCust2 = restTempl.getForObject("http://customer-service/customer/getcustomer/bymail/{email}", CustomerDTO.class,
-						newPurchase.getEmail());
-				logger.info("Created customer = "+newCust2.getId());
-				customerId = newCust2.getId();
+				}
+				try {
+					CustomerDTO newCust2 = restTempl.getForObject("http://customer-service/customer/getcustomer/bymail/{email}", 
+							CustomerDTO.class,
+							newPurchase.getEmail());
+					logger.info("Created customer = "+newCust2.getId());
+					customerId = newCust2.getId();
+				}
+				catch(RestClientException restEx) {
+					if(restEx.getMessage().contains("ConnectException")) {
+						throw new ServiceUnavailableException("Customer Service");
+					}
+				}
+			}
+			else if(excep.getMessage().contains("ConnectException")) {
+				throw new ServiceUnavailableException("Customer Service");
 			}
 		}
 		//Check for inventory
@@ -92,8 +110,13 @@ public class CheckoutOrderCustomerController {
 		}
 		catch(RestClientException ex){
 			logger.info("INVEN Rest Exception == "+ex.getMessage());
-			throw new PurchaseInCompleteException(newPurchase.getInvId(), customerId, 
+			if(ex.getMessage().contains("null")) {
+				throw new PurchaseInCompleteException(newPurchase.getInvId(), customerId, 
 					"Unable to find Inventory");
+			}
+			else if(ex.getMessage().contains("ConnectException")) {
+				throw new ServiceUnavailableException("Inventory Service");
+			}
 		}
 		logger.info("MAKE PURCHASE for "+customerId+", with inventory "+inventoryId);
 		if(customerId != null && inventoryId != null){
@@ -103,5 +126,40 @@ public class CheckoutOrderCustomerController {
 			logger.info("checkout order info === "+newOrder.getCustId()+" , Inv id = "+
 			newOrder.getInvId()+" , Order date = "+newOrder.getOrderDate());
 		}
+	}
+	
+	@RequestMapping(value="/getOrderInfoForCust/{custId}", method=RequestMethod.GET, produces= {"application/json"})
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
+	public List<CheckoutOrderDTO> getOrderInfoForCust(@PathVariable("custId") Long custId) {
+		List<CheckoutOrderDTO> checkoutOrder = new ArrayList<CheckoutOrderDTO>();
+		List<CheckoutOrder> checkoutAll = checkoutService.findAllCheckoutOrders();
+		try {
+			restTempl.getForObject("http://customer-service/customer/getcustomer/{cusId}", CustomerDTO.class, custId.longValue());
+			logger.info("Customer "+custId+" exists");
+		}
+		catch(RestClientException restExcep) {
+			logger.info("EXCEPTION = "+restExcep.getMessage());
+			if(restExcep.getMessage().contains("null")) {
+				throw new CustomerNotFoundException(custId);
+			}
+			else if(restExcep.getMessage().contains("ConnectException")) {
+				throw new ServiceUnavailableException("Customer Service");
+			}
+			else {
+				throw restExcep;
+			}
+		}
+		Stream<CheckoutOrder> checkoutForCust = checkoutAll.stream().filter(p -> p.getCustId().longValue() == custId.longValue());
+		checkoutForCust.forEach(order -> {
+			CheckoutOrderDTO checkout = new CheckoutOrderDTO();
+			System.out.println("FETCHING order id == "+order.getOrderId());
+			checkout.setCustId(order.getCustId());
+			checkout.setInvId(order.getInvId());
+			checkout.setOrderDate(order.getOrderDate());
+			checkout.setOrderId(order.getOrderId());
+			checkoutOrder.add(checkout);
+		});
+		return checkoutOrder;
 	}
 }

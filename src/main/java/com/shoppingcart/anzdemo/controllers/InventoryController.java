@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.shoppingcart.anzdemo.customer.CustomerDTO;
 import com.shoppingcart.anzdemo.exceptions.InventoryCreateException;
 import com.shoppingcart.anzdemo.exceptions.InventoryNotFoundException;
 import com.shoppingcart.anzdemo.inventory.Inventory;
@@ -31,21 +29,7 @@ public class InventoryController {
 	
 	@Autowired
 	RestTemplate restTempl;
-	/*
-	 * This method is just to test if Inter service communication is working using Eureka
-	 */
-	@RequestMapping(value="/getCustInfo/{id}", method=RequestMethod.GET, produces={"application/json"})
-	public void getCustomerInfo(@PathVariable("id") String id){
-		try{
-			CustomerDTO cust = restTempl.getForObject("http://customer-service/customer/getcustomer/{cusId}",
-					CustomerDTO.class, id);
-			logger.info("Customer info from CUSTOMER-SERVICE == "+cust.getName());
-		}
-		catch(RestClientException ex){
-			logger.info(ex.getMessage());
-		}
-	}
-	
+		
 	@RequestMapping(value="/existsornot/{invId}",method=RequestMethod.GET, produces={"application/json"})
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)

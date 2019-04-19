@@ -1,5 +1,6 @@
 package com.shoppingcart.anzdemo.services;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,5 +25,11 @@ public class CheckoutOrderServiceImpl implements CheckoutOrderRepository{
 	public CheckoutOrder findCheckoutOrderById(Long orderId) {
 		// TODO Auto-generated method stub
 		return checkoutOrderRepo.findCheckoutOrderById(orderId);
+	}
+
+	@Override
+	public List<CheckoutOrder> findAllCheckoutOrders() {
+		// TODO Auto-generated method stub
+		return checkoutOrderRepo.findAllCheckoutOrders();
 	}
 }

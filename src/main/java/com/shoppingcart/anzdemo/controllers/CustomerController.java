@@ -37,10 +37,14 @@ public class CustomerController {
 		logger.info("customer == "+customer);
 		if(customer != null && customer.size() > 0 ){
 			logger.info("customer size == "+customer.size());
-			Customer cust = customer.get(0);
-			cusObj.setEmail(cust.getEmail());
-			cusObj.setId(cust.getId());
-			cusObj.setName(cust.getName());		
+			//Since there is only one record for each Id , forEach will iterate only once.
+			customer.forEach(custItem -> {
+				if(custItem!=null) {
+					cusObj.setEmail(custItem.getEmail());
+					cusObj.setId(custItem.getId());
+					cusObj.setName(custItem.getName());
+				}
+			});			
 		}
 		else{
 			throw new CustomerNotFoundException(cusId);

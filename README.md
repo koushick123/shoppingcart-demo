@@ -12,9 +12,9 @@ The following technologies were used:
 </ul>
 Application Microservices:<br>
 <ul>
-  <li><b>Customer Service</b><br>&nbsp;&nbsp;1. Add a customer.<br>&nbsp;&nbsp;2. Check for existing customer.<br>&nbsp;&nbsp;3. Get customer details.</li>
-  <li><b>Inventory Service</b><br>&nbsp;&nbsp;1. Add an inventory.<br>&nbsp;&nbsp;2. Check for existing inventory.</li>
-  <li><b>CheckoutOrder Service</b><br>&nbsp;&nbsp;1. Check out order for a customer.<br>&nbsp;&nbsp;2. Fetch all checkedout orders for a particular customer.</li>
+  <li><b>Customer Service</b><br>&nbsp;&nbsp;1. Adds a customer.<br>&nbsp;&nbsp;2. Checks for existing customer.<br>&nbsp;&nbsp;3. Gets customer details.</li>
+  <li><b>Inventory Service</b><br>&nbsp;&nbsp;1. Adds an inventory.<br>&nbsp;&nbsp;2. Checks for existing inventory.</li>
+  <li><b>CheckoutOrder Service</b><br>&nbsp;&nbsp;1. Checks out order for a customer.<br>&nbsp;&nbsp;2. Fetches all checkedout orders for a particular customer.</li>
 </ul>
 BDD Test Case depicts below scenarios:<br>
 <ul>
@@ -28,7 +28,7 @@ The application has been deployed onto Docker Hub, where 4 container images have
   <li><b>inventory-server.yml</b></li>
   <li><b>checkoutorder-server.yml</b></li>
 </ul>
-under eureka:<br>
+under<br> eureka:<br>
 &nbsp;  client:<br>
 &nbsp;&nbsp;    serviceUrl:<br>
 &nbsp;&nbsp;&nbsp;      defaultZone: http://&lt;IP Address&gt;:8761/eureka

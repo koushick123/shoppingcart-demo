@@ -10,11 +10,16 @@ The following technologies were used:
   <li><b>Netflix Eureka (for inter-service communication)</b></li>
   <li><b>H2 in-memory DB</b></li>
 </ul>
-The 3 microservices of the application are:<br>
+Application Microservices:<br>
 <ul>
   <li><b>Customer Service</b><br>&nbsp;&nbsp;1. Add a customer<br>&nbsp;&nbsp;2. Check for existing customer<br>&nbsp;&nbsp;3. Get customer details</li>
   <li><b>Inventory Service</b><br>&nbsp;&nbsp;1. Add an inventory<br>&nbsp;&nbsp;2. Check for existing inventory</li>
   <li><b>CheckoutOrder Service</b><br>&nbsp;&nbsp;1. Check out order for a customer which will perform customer and inventory record checks<br>&nbsp;&nbsp;2. Fetch all checkedout orders for a particular customer</li>
+</ul>
+BDD Test Case depicts below scenarios:<br>
+<ul>
+  <li>Checkout an order for an existing customer</li>
+  <li>Checkout an order for a non-existing customer</li>
 </ul>
 <br>
 The application has been deployed onto Docker Hub, where 4 container images have been pushed for each of the 4 microservices (registration, customer, inventory and checkout) onto koushick123/shoppingcart-demo. <br>To run this application in a containerized version, after you build and run the registration service locally, use docker command <b>docker inspect &lt;registration_container_id&gt;</b> to obtain the IP address of the eureka registration server.<br>
